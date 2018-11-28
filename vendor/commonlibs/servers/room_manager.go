@@ -60,7 +60,9 @@ func (r *RoomManager) connect() {
 }
 
 func (r *RoomManager) Stop() {
-	r.simple.Close()
+	if r.enable {
+		r.simple.Close()
+	}
 }
 
 func (r *RoomManager) getReverse() uint32 {
