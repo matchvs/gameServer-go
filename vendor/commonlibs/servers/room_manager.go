@@ -48,7 +48,7 @@ func NewRoomManager(conf *config.RoomConf) (r *RoomManager) {
 
 func (r *RoomManager) connect() {
 	if r.enable == false {
-		log.LogW("room configuration is disable")
+		log.LogI("room manager is disable")
 		return
 	}
 	err := r.simple.Run()
@@ -56,7 +56,7 @@ func (r *RoomManager) connect() {
 		log.LogE("room manage run error :%v", err)
 		return
 	}
-	log.LogD("room manage run ...")
+	log.LogI("room manager is enable")
 }
 
 func (r *RoomManager) Stop() {

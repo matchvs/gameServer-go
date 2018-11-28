@@ -3,7 +3,7 @@
  * @Author: Ville
  * @Date: 2018-11-27 20:08:05
  * @LastEditors: Ville
- * @LastEditTime: 2018-11-28 14:34:21
+ * @LastEditTime: 2018-11-28 15:14:25
  * @Description: matchvs game server , the main module for start or stop server
  */
 
@@ -48,7 +48,7 @@ func initConfig() {
 	}
 	//设置日志级别
 	if GsConfig.Log != nil {
-		log.LogD("log level to set [%s]", GsConfig.Log.Level)
+		log.LogI("log level to set [%s]", GsConfig.Log.Level)
 		log.SetLevel(GsConfig.Log.Level)
 	}
 }

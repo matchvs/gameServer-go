@@ -81,6 +81,8 @@ func Route_FrameUpdate(ht *message.HotelMessage) {
 	}()
 
 }
+
+// get a test package which simulate server data package
 func getMessagePackage(cmdID uint32, msg []byte) *pb.Package_Frame {
 	pkg := new(pb.Package_Frame)
 	pkg.CmdId = cmdID

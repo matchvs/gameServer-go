@@ -1,13 +1,12 @@
 package test
 
 import (
-	"commonlibs/log"
-	pb "commonlibs/proto"
 	"encoding/json"
 	"strconv"
 
 	matchvs "github.com/matchvs/gameServer-go"
 	"github.com/matchvs/gameServer-go/src/defines"
+	"github.com/matchvs/gameServer-go/src/log"
 )
 
 type GsDefaultHandler struct {
@@ -169,12 +168,12 @@ func (d *GsDefaultHandler) Example_Push(req *defines.MsOnReciveEvent) {
 		operation := optMap["enableGS"].(float64)
 		d.push.FrameBroadcast(req.GameID, int32(operation), req.RoomID, data)
 	case "pushEvent":
-		event := &pb.PushToHotelMsg{
-			PushType: 1,
-			GameID:   req.GameID,
-			RoomID:   req.RoomID,
-			DstUids:  req.DestsList[:],
-			CpProto:  []byte("gameServer push event test golang"),
+		event := &defines.MsPushEventReq{
+			PushType:  1,
+			GameID:    req.GameID,
+			RoomID:    req.RoomID,
+			DestsList: req.DestsList[:],
+			CpProto:   []byte("gameServer push event test golang"),
 		}
 		d.push.PushEvent(event)
 	default:

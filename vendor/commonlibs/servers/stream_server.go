@@ -3,7 +3,7 @@
  * @Author: Ville
  * @Date: 2018-11-27 20:08:05
  * @LastEditors: Ville
- * @LastEditTime: 2018-11-28 14:36:04
+ * @LastEditTime: 2018-11-28 15:21:17
  * @Description: the module of server communication with other
  */
 
@@ -61,7 +61,7 @@ func (s *StreamServer) Start() (err error) {
 		log.LogE("server listen error %v", err)
 		return err
 	}
-	log.LogI("server addr is %v", s.addr)
+	log.LogI("game server start success [%s]", s.addr)
 	s.grpcServer.Serve(lis)
 	return nil
 }

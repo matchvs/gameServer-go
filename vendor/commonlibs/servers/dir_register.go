@@ -43,7 +43,7 @@ func NewRegister(conf *config.RegisterConf) (reg *DirRegister) {
 func (r *DirRegister) Run() {
 
 	if r.regConf.Enable == false {
-		log.LogW("register configuration is disable")
+		log.LogI("register is disable")
 		return
 	}
 
@@ -51,7 +51,7 @@ func (r *DirRegister) Run() {
 		log.LogE("register fail remote addr : %s:%d", r.regConf.RemoteHost, r.regConf.RemotePort)
 		return
 	}
-	log.LogD("register success : %s:%d", r.regConf.RemoteHost, r.regConf.RemotePort)
+	log.LogI("register success : %s:%d", r.regConf.RemoteHost, r.regConf.RemotePort)
 	r.Login()
 	go func() {
 		for {
