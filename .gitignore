@@ -1,0 +1,6 @@
+debug
+.vscode
+*.exe
+*.toml
+res
+vendor
