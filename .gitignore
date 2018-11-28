@@ -3,4 +3,3 @@ debug
 *.exe
 *.toml
 res
-vendor

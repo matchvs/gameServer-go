@@ -1,13 +1,11 @@
 package message
 
 import (
+	"commonlibs/log"
+	pb "commonlibs/proto"
+	"commonlibs/servers"
 	"errors"
 	"sync"
-
-	pb "github.com/matchvs/gameServer-go/src/proto"
-	"github.com/matchvs/gameServer-go/src/servers"
-
-	"github.com/matchvs/gameServer-go/src/log"
 )
 
 type GSAdaptor struct {

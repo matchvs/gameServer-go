@@ -3,22 +3,22 @@
  * @Author: Ville
  * @Date: 2018-11-27 20:08:05
  * @LastEditors: Ville
- * @LastEditTime: 2018-11-28 11:48:40
+ * @LastEditTime: 2018-11-28 14:20:12
  * @Description: matchvs game server , the main module for start or stop server
  */
 
 package matchvs
 
 import (
+	"commonlibs/errors"
+	"commonlibs/log"
+	pb "commonlibs/proto"
+	"commonlibs/servers"
 	"os"
 
 	conf "github.com/matchvs/gameServer-go/src/config"
 	"github.com/matchvs/gameServer-go/src/defines"
-	"github.com/matchvs/gameServer-go/src/errors"
-	"github.com/matchvs/gameServer-go/src/log"
 	"github.com/matchvs/gameServer-go/src/message"
-	pb "github.com/matchvs/gameServer-go/src/proto"
-	"github.com/matchvs/gameServer-go/src/servers"
 
 	"github.com/golang/protobuf/proto"
 )

@@ -1,11 +1,10 @@
 package message
 
 import (
+	pb "commonlibs/proto"
+	"commonlibs/servers"
 	"fmt"
 	"sync"
-
-	pb "github.com/matchvs/gameServer-go/src/proto"
-	"github.com/matchvs/gameServer-go/src/servers"
 )
 
 type MessageCache struct {

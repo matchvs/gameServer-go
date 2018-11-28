@@ -1,15 +1,13 @@
 package message
 
 import (
+	"commonlibs/log"
+	pb "commonlibs/proto"
+	"commonlibs/servers"
 	"sync"
 
-	pb "github.com/matchvs/gameServer-go/src/proto"
-
-	"github.com/matchvs/gameServer-go/src/defines"
-	"github.com/matchvs/gameServer-go/src/log"
-	"github.com/matchvs/gameServer-go/src/servers"
-
 	"github.com/golang/protobuf/proto"
+	"github.com/matchvs/gameServer-go/src/defines"
 )
 
 // 每个房间中的帧数据

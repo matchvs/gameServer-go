@@ -1,14 +1,13 @@
 package test
 
 import (
+	"commonlibs/log"
+	pb "commonlibs/proto"
 	"encoding/json"
 	"strconv"
 
-	"github.com/matchvs/gameServer-go/src/defines"
-	"github.com/matchvs/gameServer-go/src/log"
-	pb "github.com/matchvs/gameServer-go/src/proto"
-
 	matchvs "github.com/matchvs/gameServer-go"
+	"github.com/matchvs/gameServer-go/src/defines"
 )
 
 type GsDefaultHandler struct {

@@ -1,12 +1,12 @@
 package test
 
 import (
-	"gameServer-go/src/message"
-	pb "gameServer-go/src/proto"
+	pb "commonlibs/proto"
 	"testing"
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/matchvs/gameServer-go/src/message"
 )
 
 func Test_FrameRateSet(t *testing.T) {
