@@ -1,3 +1,13 @@
+/*
+ * @Company: Matchvs
+ * @Author: Ville
+ * @Date: 2018-11-28 14:30:33
+ * @LastEditors: Ville
+ * @LastEditTime: 2018-11-28 17:15:56
+ * @Description: game server handler module, the struct of  App  implemente the interface which is located in game_server.go
+ 				 it is named BaseInterface
+*/
+
 package app
 
 import (
@@ -10,7 +20,6 @@ import (
 )
 
 type App struct {
-	GameID  uint32
 	counter uint32
 	push    *matchvs.PushManager
 }

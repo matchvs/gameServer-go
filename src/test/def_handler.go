@@ -10,7 +10,6 @@ import (
 )
 
 type GsDefaultHandler struct {
-	GameID  uint32
 	counter uint32
 	push    *matchvs.PushManager
 }

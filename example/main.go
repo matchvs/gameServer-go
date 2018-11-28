@@ -1,3 +1,12 @@
+/*
+ * @Company: Matchvs
+ * @Author: Ville
+ * @Date: 2018-11-28 14:30:33
+ * @LastEditors: Ville
+ * @LastEditTime: 2018-11-28 17:05:56
+ * @Description: matchvs game server example
+ */
+
 package main
 
 import (
@@ -13,7 +22,7 @@ import (
 //程序函数入口
 func main() {
 	// 定义业务处理对象这个业务类需要 继承接口
-	handler := &app.App{GameID: uint32(123)}
+	handler := &app.App{}
 	// 创建 gameServer
 	gsserver := matchvs.NewGameServer(handler, "")
 	handler.SetPushHandler(gsserver.GetPushHandler())
@@ -24,5 +33,5 @@ func main() {
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	processStr := <-sigCh
 	gsserver.Stop()
-	fmt.Printf("close service %v", processStr)
+	fmt.Printf("service close  %v", processStr)
 }

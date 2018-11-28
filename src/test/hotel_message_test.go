@@ -11,7 +11,7 @@ import (
 
 func Test_FrameRateSet(t *testing.T) {
 	var (
-		hd_test       = &GsDefaultHandler{GameID: 200773}
+		hd_test       = &GsDefaultHandler{}
 		cache_test    = message.NewMessageCache()
 		hotelMsg_test = message.NewHotelModel(hd_test, cache_test)
 	)
