@@ -3,14 +3,13 @@
  * @Author: Ville
  * @Date: 2018-11-27 20:08:05
  * @LastEditors: Ville
- * @LastEditTime: 2018-11-28 14:22:46
+ * @LastEditTime: 2018-11-28 14:35:56
  * @Description: file content
  */
 
 package servers
 
 import (
-	"commonlibs/log"
 	pb "commonlibs/proto"
 	"context"
 	"errors"
@@ -21,6 +20,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/matchvs/gameServer-go/src/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

@@ -1,12 +1,12 @@
 package app
 
 import (
-	"commonlibs/log"
 	"encoding/json"
 	"strconv"
 
 	"github.com/matchvs/gameServer-go"
 	"github.com/matchvs/gameServer-go/src/defines"
+	"github.com/matchvs/gameServer-go/src/log"
 )
 
 type App struct {

@@ -1,7 +1,6 @@
 package servers
 
 import (
-	"commonlibs/log"
 	pb "commonlibs/proto"
 	"fmt"
 	"hash/crc32"
@@ -9,6 +8,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/matchvs/gameServer-go/src/config"
+	"github.com/matchvs/gameServer-go/src/log"
 )
 
 var pushHandler *RegisterPushHandler

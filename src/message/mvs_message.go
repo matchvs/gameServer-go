@@ -1,7 +1,6 @@
 package message
 
 import (
-	"commonlibs/log"
 	pb "commonlibs/proto"
 	"commonlibs/servers"
 	"math/rand"
@@ -10,6 +9,7 @@ import (
 	"github.com/deckarep/golang-set"
 	"github.com/golang/protobuf/proto"
 	"github.com/matchvs/gameServer-go/src/defines"
+	"github.com/matchvs/gameServer-go/src/log"
 )
 
 // Mvs 消息路由类型

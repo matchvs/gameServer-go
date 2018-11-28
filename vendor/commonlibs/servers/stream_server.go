@@ -3,7 +3,7 @@
  * @Author: Ville
  * @Date: 2018-11-27 20:08:05
  * @LastEditors: Ville
- * @LastEditTime: 2018-11-28 14:21:23
+ * @LastEditTime: 2018-11-28 14:36:04
  * @Description: the module of server communication with other
  */
 
@@ -11,7 +11,6 @@ package servers
 
 import (
 	"commonlibs/errors"
-	"commonlibs/log"
 	pb "commonlibs/proto"
 	"io"
 	"net"
@@ -19,6 +18,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/matchvs/gameServer-go/src/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

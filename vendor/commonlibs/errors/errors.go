@@ -3,9 +3,8 @@ package errors
 import (
 	"runtime"
 
-	"commonlibs/log"
-
 	"github.com/davecgh/go-spew/spew"
+	"github.com/matchvs/gameServer-go/src/log"
 )
 
 // 产生panic时的调用栈打印

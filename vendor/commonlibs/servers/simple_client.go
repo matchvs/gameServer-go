@@ -1,10 +1,10 @@
 package servers
 
 import (
-	"commonlibs/log"
 	pb "commonlibs/proto"
 	"fmt"
 
+	"github.com/matchvs/gameServer-go/src/log"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
