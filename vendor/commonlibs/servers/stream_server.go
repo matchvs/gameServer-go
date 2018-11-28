@@ -3,7 +3,7 @@
  * @Author: Ville
  * @Date: 2018-11-27 20:08:05
  * @LastEditors: Ville
- * @LastEditTime: 2018-11-28 15:21:17
+ * @LastEditTime: 2018-11-28 16:53:49
  * @Description: the module of server communication with other
  */
 
@@ -16,6 +16,7 @@ import (
 	"net"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/matchvs/gameServer-go/src/log"
@@ -24,7 +25,7 @@ import (
 )
 
 const (
-	VERSION = 2 //通信协议版本
+	VERSION = 2
 )
 
 type GSRequest *pb.Package_Frame
@@ -36,12 +37,13 @@ type IGSServer interface {
 	Route(userid uint64, req GSRequest, rsp GSWrite) (err error)
 }
 
-// 继承 pb.CSStreamServer
+// pb.CSStreamServer
 type StreamServer struct {
 	addr       string
 	timeOut    int64
 	grpcServer *grpc.Server
 	gsServer   IGSServer
+	isClose    int32
 }
 
 func NewStreamServer(add string, gs IGSServer, timeout int64) (sc *StreamServer) {
@@ -50,11 +52,11 @@ func NewStreamServer(add string, gs IGSServer, timeout int64) (sc *StreamServer)
 	sc.gsServer = gs
 	sc.addr = add
 	sc.timeOut = timeout
+	sc.isClose = 0
 	pb.RegisterCSStreamServer(sc.grpcServer, sc)
 	return
 }
 
-// 启动一个 grpc 服务端
 func (s *StreamServer) Start() (err error) {
 	lis, err := net.Listen("tcp", s.addr)
 	if err != nil {
@@ -66,12 +68,19 @@ func (s *StreamServer) Start() (err error) {
 	return nil
 }
 
-// 停止 grpc 服务
 func (s *StreamServer) Stop() {
+	atomic.AddInt32(&s.isClose, 1)
 	s.grpcServer.Stop()
+	log.LogI("server close")
 }
 
-//获取元组数据
+func (s *StreamServer) IsClose() bool {
+	if atomic.LoadInt32(&s.isClose) > 0 {
+		return true
+	}
+	return false
+}
+
 func getMetadata(md metadata.MD) (userid uint64, token string, err error) {
 	if len(md["userid"]) == 0 {
 		log.LogD("cannot read key:userid from metadata")
@@ -92,8 +101,6 @@ func getMetadata(md metadata.MD) (userid uint64, token string, err error) {
 	return
 }
 
-// 继承 proto 协议中 CSStreamServer 双向流接口
-// 有客户端发送消息的时候就是走的这里
 func (s *StreamServer) Stream(stream pb.CSStream_StreamServer) error {
 	defer errors.PrintPanicStack()
 
@@ -124,6 +131,7 @@ func (s *StreamServer) Stream(stream pb.CSStream_StreamServer) error {
 	wg.Wait()
 
 	for {
+
 		select {
 		case frame, ok := <-sessionCh:
 			if !ok {
@@ -154,7 +162,6 @@ func (s *StreamServer) route(frame *pb.Package_Frame, stopCh chan *pb.Package_Fr
 	return nil
 }
 
-//接收客户端发送过来的消息
 func (s *StreamServer) recv(stream pb.CSStream_StreamServer, sessionCh chan *pb.Package_Frame, wg *sync.WaitGroup) {
 	defer func() {
 		close(sessionCh)
@@ -162,7 +169,9 @@ func (s *StreamServer) recv(stream pb.CSStream_StreamServer, sessionCh chan *pb.
 	wg.Done()
 	for {
 		in, err := stream.Recv()
-		// log.LogD("收到消息：%v", in)
+		if s.IsClose() {
+			return
+		}
 		if err == io.EOF {
 			log.LogD(" stream recive EOF")
 			return

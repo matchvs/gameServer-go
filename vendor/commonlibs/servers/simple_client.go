@@ -43,6 +43,7 @@ func (c *SimpleClient) Run() (err error) {
 // Close 断开连接
 func (c *SimpleClient) Close() {
 	c.conn.Close()
+	log.LogI("room manager close")
 }
 
 // Send 发送消息

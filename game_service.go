@@ -3,7 +3,7 @@
  * @Author: Ville
  * @Date: 2018-11-27 20:08:05
  * @LastEditors: Ville
- * @LastEditTime: 2018-11-28 15:14:25
+ * @LastEditTime: 2018-11-28 16:56:22
  * @Description: matchvs game server , the main module for start or stop server
  */
 
@@ -14,6 +14,7 @@ import (
 	pb "commonlibs/proto"
 	"commonlibs/servers"
 	"os"
+	"strings"
 
 	conf "github.com/matchvs/gameServer-go/src/config"
 	"github.com/matchvs/gameServer-go/src/defines"
@@ -34,12 +35,15 @@ type BaseGsHandler interface {
 }
 
 // 初始化读取配置
-func initConfig() {
+func initConfig(confFile string) {
 	var (
 		err error
 	)
 	//获取命令行参数
 	args := conf.NewTerminalCmd()
+	if strings.TrimSpace(confFile) != "" {
+		args.ConfFile = confFile
+	}
 	// 获取配置文件参数
 	GsConfig, err = conf.NewGsConfig(args.ConfFile)
 	//log.LogD("configuration file read success %s", args.ConfFile)
@@ -61,8 +65,11 @@ type GameServer struct {
 	server  *servers.StreamServer
 }
 
-func NewGameServer(hd BaseGsHandler) (g *GameServer) {
-	initConfig()
+// NewGameServer is game server manager , you can start or stop to use it
+// BaseGsHandler is base handler class , you neet to implement BaseGsHandler
+// confFile the configuration file path (include the name). if confFile value is "" ,default read "./conf/config.toml"
+func NewGameServer(hd BaseGsHandler, confFile string) (g *GameServer) {
+	initConfig(confFile)
 	g = new(GameServer)
 	g.handler = hd
 	g.adaptor = message.NewGSAdaptor(g.handler)
@@ -83,7 +90,7 @@ func (g *GameServer) Start() (err error) {
 		log.LogE("gameServer start err %v", err)
 		os.Exit(-1)
 	}
-	log.LogI("ok")
+	register.Stop()
 	return nil
 }
 
