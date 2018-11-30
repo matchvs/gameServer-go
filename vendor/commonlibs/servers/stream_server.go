@@ -3,7 +3,7 @@
  * @Author: Ville
  * @Date: 2018-11-27 20:08:05
  * @LastEditors: Ville
- * @LastEditTime: 2018-11-28 16:53:49
+ * @LastEditTime: 2018-11-30 14:38:18
  * @Description: the module of server communication with other
  */
 
@@ -177,7 +177,6 @@ func (s *StreamServer) recv(stream pb.CSStream_StreamServer, sessionCh chan *pb.
 			return
 		}
 		if err != nil {
-			log.LogD(" stream recive error %v", err)
 			return
 		}
 		sessionCh <- in
