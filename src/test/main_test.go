@@ -11,9 +11,9 @@ import (
 
 func Test_MainServer(t *testing.T) {
 	// 定义业务处理对象这个业务类需要 继承接口
-	handler := &app.App{GameID: uint32(123)}
+	handler := &app.App{}
 	// 创建 gameServer
-	gsserver := matchvs.NewGameServer(handler, "../conf/config.toml")
+	gsserver := matchvs.NewGameServer(handler, "../../example/conf/config.toml.sample")
 	handler.SetPushHandler(gsserver.GetPushHandler())
 
 	go func() {
