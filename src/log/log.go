@@ -27,9 +27,9 @@ var (
 	 * 日志输出格式
 	 */
 	logFormat = []string{
-		`%{shortfunc} ▶ %{level:.4s} %{message}`,
-		`%{time:15:04:05.00} %{shortfile} ▶ %{level:.4s} %{id:03x} %{message}`,
-		`%{color}%{time:15:04:05.00} %{shortfunc} %{shortfile} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}`,
+		`%{shortfunc} ▶ %{level} %{message}`,
+		`%{time:15:04:05.00} %{shortfile} ▶ %{level} %{id:03x} %{message}`,
+		`%{color}%{time:15:04:05.00} %{shortfunc} %{shortfile} ▶ %{level} %{id:03x}%{color:reset} %{message}`,
 	}
 
 	/**
