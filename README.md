@@ -118,7 +118,9 @@ exit status 2
   2018/11/30 16:26:43.63 stream_server.go:66 ▶ INFO 004 game server start success [0.0.0.0:36520]
 ```
 
+####  [下一步 ]()   go gameServer 本地调试
 
+文档正在努力输出中
 
 #### [下一步 ]()   go gameServer 接口编程说明 
 
