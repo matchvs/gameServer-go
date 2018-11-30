@@ -41,7 +41,6 @@ func (self *roomFrameDataPool) addFrameData(gameID, frameIndex uint32, roomID ui
 		roomframe = new(roomFrameData)
 		roomframe.FrameData = make(map[uint32]*defines.FrameDataList)
 		self.cache[roomID] = roomframe
-		// log.LogD(" addFrameData room frameSync number [%v]", len(self.cache))
 	}
 	frameData, ok = roomframe.FrameData[frameIndex]
 	if !ok {
@@ -99,7 +98,7 @@ func (self *roomFrameDataPool) delFrameData(frameIndex uint32, roomID uint64) {
 func (self *roomFrameDataPool) delRoomFrame(roomID uint64) {
 	self.lock.Lock()
 	delete(self.cache, roomID)
-	log.LogD("delRoomFrame room frameSync number [%v]", len(self.cache))
+	// log.LogD("delRoomFrame room frameSync number [%v]", len(self.cache))
 	self.lock.Unlock()
 }
 
@@ -258,7 +257,6 @@ func (m *HotelMessage) onDeleteRoom(connID uint64, req servers.GSRequest) ([]byt
 	ack := &pb.CloseConnectAck{
 		Status: uint32(pb.ErrorCode_OK),
 	}
-	log.LogD("onDeleteRoom")
 	return proto.Marshal(ack)
 }
 

@@ -5,6 +5,7 @@ Host = "0.0.0.0:36520"
 # Level's value can INFO、DEBUG、ERROR、WARNING, the default value is INFO
 Level = "DEBUG"
 
+# 独立部署参数配置
 [Register]
 Enable = false
 GameID = 123456
@@ -15,8 +16,9 @@ RemotePort = 9981
 LocalHost = "192.168.8.2"
 LocalPort = 30054
 
-
+# RoomManage 房间管理参数配置
 [RoomManage]
+# 需要使用房间管理 就设置为 true
 Enable = false
 SvcName = "svc-abc"
 PodName = "pod-abc"
