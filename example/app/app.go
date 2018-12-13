@@ -3,7 +3,7 @@
  * @Author: Ville
  * @Date: 2018-11-28 14:30:33
  * @LastEditors: Ville
- * @LastEditTime: 2018-11-28 17:15:56
+ * @LastEditTime: 2018-12-03 18:31:38
  * @Description: game server handler module, the struct of  App  implemente the interface which is located in game_server.go
  				 it is named BaseInterface
 */
@@ -24,18 +24,25 @@ type App struct {
 	push    *matchvs.PushManager
 }
 
+func NewApp() *App {
+	app := &App{
+		counter: 0,
+	}
+	return app
+}
+
 func (self *App) SetPushHandler(push *matchvs.PushManager) {
 	self.push = push
 }
 
 // 创建房间回调
-func (d *App) OnCreateRoom(req map[string]interface{}) (err error) {
+func (d *App) OnCreateRoom(req *defines.MsOnCreateRoom) (err error) {
 	log.LogD(" OnCreateRoom %v", req)
 	return
 }
 
 // 加入房间回调
-func (d *App) OnJoinRoom(req map[string]interface{}) (err error) {
+func (d *App) OnJoinRoom(req *defines.MsOnJoinRoom) (err error) {
 	log.LogD(" OnJoinRoom %v", req)
 	return
 }

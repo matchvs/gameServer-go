@@ -272,19 +272,19 @@ func (m *HotelMessage) onPlayerCheckin(connID uint64, req servers.GSRequest) ([]
 	proto.Unmarshal(joinroom.CpProto, roominfo)
 	m.msgCache.DelWaitJoin(playercheckin.RoomID, playercheckin.UserID)
 
-	// 业务处理 onJoinRoom
-	joinInfo := make(map[string]interface{})
-	joinInfo["roomID"] = playercheckin.RoomID
-	joinInfo["userID"] = playercheckin.UserID
-	joinInfo["gameID"] = playercheckin.GameID
-	joinInfo["userProfile"] = string(roominfo.GetUserProfile())
-	joinInfo["joinType"] = roominfo.GetJoinType()
-	joinInfo["maxPlayers"] = playercheckin.GetMaxPlayers()
-	joinInfo["checkins"] = playercheckin.GetCheckins()
-	joinInfo["players"] = playercheckin.GetPlayers()
+	onjoin := &defines.MsOnJoinRoom{
+		RoomID:      playercheckin.RoomID,
+		UserID:      playercheckin.UserID,
+		GameID:      playercheckin.GameID,
+		UserProfile: roominfo.GetUserProfile(),
+		JoinType:    roominfo.GetJoinType(),
+		MaxPlayers:  playercheckin.GetMaxPlayers(),
+		Checkins:    playercheckin.GetCheckins(),
+		Players:     playercheckin.GetPlayers(),
+	}
 
 	// 业务处理
-	m.handle.OnJoinRoom(joinInfo)
+	m.handle.OnJoinRoom(onjoin)
 	ack := &pb.PlayerCheckinAck{
 		Status: uint32(pb.ErrorCode_OK),
 	}

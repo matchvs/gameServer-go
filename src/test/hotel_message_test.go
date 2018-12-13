@@ -2,6 +2,7 @@ package test
 
 import (
 	pb "commonlibs/proto"
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -28,7 +29,7 @@ func Test_FrameRateSet(t *testing.T) {
 	hotelMsg_test.Route(200773, req)
 	Route_FrameNotify(hotelMsg_test)
 	Route_FrameUpdate(hotelMsg_test)
-
+	Route_RecvEvent(hotelMsg_test)
 	time.Sleep(time.Second * 20)
 }
 
@@ -80,6 +81,40 @@ func Route_FrameUpdate(ht *message.HotelMessage) {
 		}
 	}()
 
+}
+
+func Route_RecvEvent(ht *message.HotelMessage) {
+	go func() {
+		for i := 0; i < 5000; i++ {
+			go func(index uint32) {
+				data := &struct {
+					Cmd  string `json:"cmd"`
+					Data string `json:"data"`
+				}{Cmd: "event", Data: "gameServer test uint"}
+				// fmt.Printf("data:%v", *data)
+				databuf, _ := json.Marshal(data)
+				for j := 0; j <= 20; j++ {
+					if j >= 20 {
+						data.Cmd = "end"
+						databuf, _ = json.Marshal(data)
+					}
+					event := &pb.HotelBroadcast{
+						GameID:  200773,
+						RoomID:  14567894561454,
+						Flag:    1,
+						DstUids: []uint32{123456},
+						CpProto: databuf,
+					}
+					buf, _ := proto.Marshal(event)
+					req := getMessagePackage(uint32(pb.HotelGsCmdID_HotelBroadcastCMDID), buf)
+					ht.Route(200773, req)
+					time.Sleep(time.Millisecond * 100)
+				}
+				return
+			}(uint32(i))
+			time.Sleep(time.Millisecond * 100)
+		}
+	}()
 }
 
 // get a test package which simulate server data package

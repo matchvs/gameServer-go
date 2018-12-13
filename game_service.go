@@ -3,7 +3,7 @@
  * @Author: Ville
  * @Date: 2018-11-27 20:08:05
  * @LastEditors: Ville
- * @LastEditTime: 2018-11-28 16:56:22
+ * @LastEditTime: 2018-12-06 18:01:30
  * @Description: matchvs game server , the main module for start or stop server
  */
 
@@ -125,16 +125,16 @@ func (self *PushManager) SetGameID(gameID uint32) {
 	self.gameID = gameID
 }
 
-func (self *PushManager) PushEvent(req *defines.MsPushEventReq) {
+func (self *PushManager) PushEvent(req *defines.MsPushEventReq) error {
 	event := &pb.PushToHotelMsg{
 		PushType: pb.PushMsgType(req.PushType),
 		GameID:   req.GameID,
 		RoomID:   req.RoomID,
 		DstUids:  req.DestsList[:],
-		CpProto:  []byte("gameServer push event test golang"),
+		CpProto:  req.CpProto[:],
 	}
 	msg, _ := proto.Marshal(event)
-	self.adaptor.PushHotel(uint32(pb.HotelGsCmdID_HotelPushCMDID), req.RoomID, msg)
+	return self.adaptor.PushHotel(uint32(pb.HotelGsCmdID_HotelPushCMDID), req.RoomID, msg)
 }
 
 func (self *PushManager) JoinOver(gameID uint32, roomID uint64) {

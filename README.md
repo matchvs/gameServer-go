@@ -356,6 +356,7 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gameserver_go
 		config.toml		# 配置文件
 	├ Dockerfile		# docker 文件
 	├ gameserver_go	 	# linux下的可执行程序 必须为 gameserver_go
+├ Makefile  # make 文件
 └ gsmeta 		# 数据源文件内容不能修改
 ````
 

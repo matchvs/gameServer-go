@@ -6,9 +6,9 @@ import (
 
 type IHandler interface {
 	// 创建房间回调
-	OnCreateRoom(map[string]interface{}) error
+	OnCreateRoom(*defines.MsOnCreateRoom) error
 	// 加入房间回调
-	OnJoinRoom(map[string]interface{}) error
+	OnJoinRoom(*defines.MsOnJoinRoom) error
 	// 关闭房间回调
 	OnJoinOver(map[string]interface{}) error
 	// 打开房间回调

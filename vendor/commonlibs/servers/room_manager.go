@@ -2,6 +2,7 @@ package servers
 
 import (
 	pb "commonlibs/proto"
+	"errors"
 	"fmt"
 	"hash/crc32"
 	"os"
@@ -74,6 +75,10 @@ func (r *RoomManager) getReverse() uint32 {
 }
 
 func (r *RoomManager) sendMsg(cmdID uint32, msg []byte) (*pb.Package_Frame, error) {
+	if r.enable == false {
+		log.LogE("room manager is disable")
+		return nil, errors.New("room manager is disable")
+	}
 	req := &pb.Package_Frame{
 		Type:     pb.Package_LeagueMessage,
 		Version:  VERSION,
@@ -82,7 +87,7 @@ func (r *RoomManager) sendMsg(cmdID uint32, msg []byte) (*pb.Package_Frame, erro
 		UserId:   uint64(r.userID),
 		Message:  msg[:len(msg)],
 	}
-	log.LogD("room manager send message [:%v]", req)
+	// log.LogD("room manager send message [:%v]", req)
 	resp, err := r.simple.Send(req)
 	if err != nil {
 		log.LogE("room manage send message error :%v", err)

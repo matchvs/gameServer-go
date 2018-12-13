@@ -119,18 +119,21 @@ func (m *MvsMessage) Route(connID uint64, req servers.GSRequest) (res []byte, er
 func (m *MvsMessage) OnCreateRoom(req *pb.Request) ([]byte, error) {
 	createinfo := &pb.CreateExtInfo{}
 	proto.Unmarshal(req.CpProto, createinfo)
-	infoMap := make(map[string]interface{})
-	infoMap["userID"] = createinfo.UserID
-	infoMap["userProfile"] = string(createinfo.UserProfile)
-	infoMap["roomID"] = createinfo.RoomID
-	infoMap["roomProperty"] = string(createinfo.RoomProperty)
-	infoMap["maxPlayer"] = createinfo.MaxPlayer
-	infoMap["state"] = createinfo.State
-	infoMap["mode"] = createinfo.Mode
-	infoMap["canWatch"] = createinfo.CanWatch
-	infoMap["createFlag"] = createinfo.CreateFlag
-	infoMap["createTime"] = createinfo.CreateTime
-	m.handle.OnCreateRoom(infoMap)
+
+	room := &defines.MsOnCreateRoom{
+		GameID:       req.GameID,
+		UserID:       createinfo.UserID,
+		RoomID:       createinfo.RoomID,
+		UserProfile:  createinfo.GetUserProfile(),
+		RoomProperty: createinfo.GetRoomProperty(),
+		MaxPlayer:    createinfo.GetMaxPlayer(),
+		State:        createinfo.GetState(),
+		Mode:         createinfo.GetMode(),
+		CanWatch:     createinfo.GetCanWatch(),
+		CreateFlag:   createinfo.GetCreateFlag(),
+		CreateTime:   createinfo.GetCreateTime(),
+	}
+	m.handle.OnCreateRoom(room)
 	return nil, nil
 }
 
@@ -196,7 +199,6 @@ func (m *MvsMessage) OnUserState(req *pb.Request) ([]byte, error) {
 	infoMap["roomID"] = roomID
 	infoMap["state"] = state
 	m.handle.OnUserState(infoMap)
-	log.LogD("OnUserState state:[%s]", string(req.CpProto))
 	if state == 3 {
 		m.msgCache.DelWaitJoin(roomID, userID)
 	}

@@ -19,13 +19,13 @@ func (self *GsDefaultHandler) SetPushHandler(push *matchvs.PushManager) {
 }
 
 // 创建房间回调
-func (d *GsDefaultHandler) OnCreateRoom(req map[string]interface{}) (err error) {
+func (d *GsDefaultHandler) OnCreateRoom(req *defines.MsOnCreateRoom) (err error) {
 	log.LogD(" OnCreateRoom %v", req)
 	return
 }
 
 // 加入房间回调
-func (d *GsDefaultHandler) OnJoinRoom(req map[string]interface{}) (err error) {
+func (d *GsDefaultHandler) OnJoinRoom(req *defines.MsOnJoinRoom) (err error) {
 	log.LogD(" OnJoinRoom %v", req)
 	return
 }
@@ -120,9 +120,8 @@ func (d *GsDefaultHandler) Example_Push(req *defines.MsOnReciveEvent) {
 		log.LogE("event message Unmarshal error %v", err)
 		return
 	}
-
+	// log.LogD("event message [%v]", optMap)
 	cmd := optMap["cmd"].(string)
-	log.LogD("event message [%v]", optMap)
 	switch cmd {
 	case "createRoom":
 		d.example_createRoom(req.GameID)
