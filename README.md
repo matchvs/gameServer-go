@@ -1,6 +1,9 @@
 # Matchvs Golang 版 gameServer
 
-使用 golang 版本的 gameServer 需要在本地安装好 golang 运行环境。如果还没有配置好 golang 环境的请先配置好。以下内容教程是默认你已经配置好并且熟悉 golang 开发环境。
+使用 golang 版本的 gameServer 须知：
+
+- 需要在本地安装好 golang 运行环境。如果还没有配置好 golang 环境的请先配置好。以下内容教程是默认你已经配置好并且熟悉 golang 开发环境。
+- 在 Matchvs 官网创建了 gameServer。
 
 [github 地址](https://github.com/matchvs/gameServer-go) 
 
@@ -20,9 +23,9 @@
 go get -u github.com/matchvs/gameServer-go
 ```
 
-拉取成功后可以在你的 $GOPATH/github.com 目录下面看到 matchvs/gameServer-go 的服务代码。
+拉取成功后可以在你的 $GOPATH/src/github.com 目录下面看到 matchvs/gameServer-go 的服务代码。
 
-在你的 `$GOPATH/github.com/ matchvs/gameServer-go` 目录下面有一个 example 文件，文件中的内容结构如下：
+在你的 `$GOPATH/src/github.com/ matchvs/gameServer-go` 目录下面有一个 example 文件，文件中的内容结构如下：
 
 ```
 ┌ app/  		# 业务代码
@@ -41,7 +44,7 @@ go get -u github.com/matchvs/gameServer-go
   git clone https://git.matchvs.com/xxxxxxxxxx.git gogs-demo
 ```
 
-- 复制 `$GOPATH/github.com/ matchvs/gameServer-go/example/` 文件里面的内容到你刚刚拉下的仓库目录。
+- 复制 `$GOPATH/src/github.com/matchvs/gameServer-go/example/` 文件里面的内容到你刚刚拉下的仓库目录。
 
 #### 3、修改配置文件
 
@@ -94,7 +97,7 @@ E:/Work/GOPATH/src/github.com/matchvs/gameServer-go/src/config/config.go:56 +0x1
 exit status 2
 ```
 
-- 修改和 main.go 文件 import 中的内容。在 app.go 和 main.go import 文件中我们看到如下内容:
+- 修改和 main.go 文件 import 中的内容。在  main.go import 文件中我们看到如下内容:
 
 ```go
 "github.com/matchvs/gameServer-go/example/app"
@@ -108,8 +111,7 @@ exit status 2
 
   > 注意：以上内容是 golang 包导入的知识，如果不太理解请阅读 golang 相关的知识。
   >
-  >
-  >  如果没有修改 "github.com/matchvs/gameServer-go/example/app"  内容为你自己的项目内容，则项目运行将运行 example 中的 app.go
+  >   如果没有修改 "github.com/src/matchvs/gameServer-go/example/app"  内容为你自己的项目内容，则项目运行将运行 example 中的 app.go
 
 - 修改好 import 内容后就可以运行 第一个 gameServer 程序啦。运行内容大概如下：
 
@@ -308,7 +310,7 @@ quit
 
 - 使用 go 命令编译：需要指定编译环境。
 
-使用 make 编译可执行文件会在你的项目目录下生成 docker_build 文件夹，内容结构如下：
+第一种：使用 make 编译可执行文件会在你的项目目录下生成 docker_build 文件夹，内容结构如下：
 
 ```
 ├ docker_build/ 		#docker 打包文件 文件名不能修改
@@ -319,7 +321,7 @@ quit
 
 ```
 
-使用 go 命令编译必须制定编译参数，生成的可执行文件名称必须为 gameserver_go，使用如下命令编译：
+第二种：使用 go 命令编译必须制定编译参数，生成的可执行文件名称必须为 gameserver_go，使用如下命令编译：
 
 ```powershell
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gameserver_go
@@ -362,6 +364,185 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gameserver_go
 
 但是为了你的代码管理最好把你工程的所有源代码也一起提交到你的 gameServer  git 仓库。
 
-#### [下一步 ]()   go gameServer 接口编程说明 
 
-文档正在努力输出中
+
+# Matchvs gameServer-go 框架使用
+
+阅读这些内容之前，请先阅读 gameServer-go 入门文档。
+
+gameServer-go 框架代码在src中，示例代码在 example 中。我们以 example 中的代码为示例对接口信息说明。
+
+## 框架入口
+
+在 example/main.go 文件中可看到如下代码：
+
+```go
+func main() {
+	// handler 实现接口 matchvs.BaseGsHandler
+	handler := app.NewApp()
+	// 创建 gameServer
+	gsserver := matchvs.NewGameServer(handler, "")
+    // 设置消息推送
+	handler.SetPushHandler(gsserver.GetPushHandler())
+	// 启动 gameSever 服务
+	go gsserver.Start()
+	......
+}
+```
+
+- NewApp()： 是 example/app/app.go 中的 App 类型。这个类型实现了接口  BaseGsHandler。
+
+- NewGameServer()： 是 "github.com/matchvs/gameServer-go" 中的类型。使用 NewGameServer(...) 创建 gameServer 服务需要传入 BaseGsHandler 接口类型来处理相关的业务。
+- SetPushHandler()：是设置消息推送业务类，这个类型是从 gameServer 类型中使用 GetPushHandler() 获取
+- Start()：启动 gameServer 服务。
+
+## 业务处理类型
+
+定义业务处理类型要满足一下几个条件：
+
+- 必须实现接口 BaseGsHandler ： 接受服务消息接口
+- 必须定义 PushManager 类型成员：主动推送消息接口。
+
+例如 example/app/app.go 的 App 类型定义
+
+````go
+type App struct {
+    ......
+    // push 用于主动推送消息的服务。
+	push    matchvs.PushHandler
+}
+func (self *App) SetPushHandler(push matchvs.PushHandler) {
+	self.push = push
+}
+......
+````
+
+所有的业务操作入口和出口都是在 App 这个业务类型中。开发者也可以自己修改定义这个类型。只要满足上面的两个条件即可。
+
+## 数据接收业务接口
+
+BaseGsHandler 接口类型是用于接收服务推送的消息。接口定义如下：
+
+```go
+type BaseGsHandler interface {
+    // 消息接收
+	message.IHandler
+    // 消息推送
+	SetPushHandler(PushHandler)
+}
+```
+
+BaseGsHandler 扩展 IHandler 类型
+
+```go
+type IHandler interface {
+	// 创建房间回调
+	OnCreateRoom(*defines.MsOnCreateRoom) error
+	// 加入房间回调
+	OnJoinRoom(*defines.MsOnJoinRoom) error
+	// 关闭房间回调
+	OnJoinOver(map[string]interface{}) error
+	// 打开房间回调
+	OnJoinOpen(map[string]interface{}) error
+	// 离开房间回调
+	OnLeaveRoom(map[string]interface{}) error
+	// 踢人回调
+	OnKickPlayer(map[string]interface{}) error
+	// 连接状态回调
+	OnUserState(map[string]interface{}) error
+	// 获取房间信息回调
+	OnRoomDetail(*defines.MsRoomDetail) error
+	// 设置房间属性回调
+	OnSetRoomProperty(map[string]interface{}) error
+	// 房间连接回调
+	OnHotelConnect(map[string]interface{}) error
+	// 消息广播
+	OnReceiveEvent(*defines.MsOnReciveEvent) error
+	// 房间断开
+	OnDeleteRoom(map[string]interface{}) error
+	// 连接房间检测回调
+	OnHotelCheckin(map[string]interface{}) error
+	// 设置帧同步
+	OnSetFrameSyncRate(*defines.MsFrameSyncRateNotify) error
+	// 帧数据更新
+	OnFrameUpdate(*defines.FrameDataList) error
+}
+```
+
+`IHandler` 接口中的函数是与 `Matchvs SDK` 中的操作对应，同时也与 `PushHandler`  主动推送接口中的操作对应。
+
+例如：在 SDK 中有人触发了 `createRoom` 或者 `joinRoom` 接口，`gameServer` 会触发 `IHandler` 的 `OnCreateRoom` 和 `OnJoinRoom` 函数。
+
+
+
+## 数据推送接口
+
+PushHandler 接口用于 gameServer 主动推送数据。接口定义如下：
+
+```go
+type PushHandler interface {
+	// PushEvent 发送房间消息
+	// req 要推送的消息
+	PushEvent(req *defines.MsPushEventReq) error
+	// JoinOver 关闭房间
+	// gameID : 游戏ID
+	// roomID ：房间ID
+	JoinOver(gameID uint32, roomID uint64)
+	// JoinOpen 打开房间
+	// gameID : 游戏ID
+	// roomID ：房间ID
+	JoinOpen(gameID uint32, roomID uint64)
+	// KickPlayer 踢除指定玩家
+	// destID : 要踢除的玩家
+	// roomID : 房间ID
+	KickPlayer(destID uint32, roomID uint64)
+	// GetRoomDetail 获取房间详细信息
+	// gameID : 游戏ID
+	// roomID ：房间ID
+	// latestWatcherNum : 获取最新观战人数的房间
+	GetRoomDetail(gameID, latestWatcherNum uint32, roomID uint64)
+	// SetRoomProperty 设置房间属性
+	// gameID : 游戏ID
+	// roomID ：房间ID
+	// roomProperty : 房间属性
+	SetRoomProperty(gameID uint32, roomID uint64, roomProperty string)
+	// CreateRoom 主动创建房间
+	// crtm ： 创建房间的参数信息
+	// 返回类型 MsCreateRoomRsp 是创建后的状态信息
+	CreateRoom(crtm *defines.MsCreateRoomReq) (*defines.MsCreateRoomRsp, error)
+	// TouchRoom 设置房间的存活时间
+	// 返回 200 表示成功
+	// gameID : 游戏ID
+	// ttl 	  : 空房间存活时长(房间没有任何玩家的情况)，单位秒，最大取值 86400 秒（1天）
+	// roomID : 房间ID
+	TouchRoom(gameID, ttl uint32, roomID uint64) (uint32, error)
+	// DestroyRoom 主动销毁房间，可以销毁任意房间，如果房间中有人，就会把人剔出房间
+	// 返回 200 表示成功
+	// gameID : 游戏ID
+	// roomID ：房间ID
+	DestroyRoom(gameID uint32, roomID uint64) (uint32, error)
+	// SetFrameSyncRate 设置帧同步参数
+	// gameID : 游戏ID
+	// frameRate : 帧率（0到20，且能被1000整除）
+	// enableGS GameServer是否参与帧同步（0：不参与；1：参与）
+	// roomID : 要设置帧同步的房间ID
+	SetFrameSyncRate(gameID, frameRate, enableGS uint32, roomID uint64)
+	// FrameBroadcast 发送帧同步数据给 游戏房间服务
+	// gameID : 游戏ID
+	// operation : 数据处理方式 0：只发客户端；1：只发GS；2：同时发送客户端和GS
+	// roomID : 房间ID
+	// cpProto : 要发送的数据
+	FrameBroadcast(gameID uint32, operation int32, roomID uint64, cpProto []byte)
+}
+```
+
+
+
+
+
+
+
+
+
+
+

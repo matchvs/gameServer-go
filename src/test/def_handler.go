@@ -11,10 +11,10 @@ import (
 
 type GsDefaultHandler struct {
 	counter uint32
-	push    *matchvs.PushManager
+	push    matchvs.PushHandler
 }
 
-func (self *GsDefaultHandler) SetPushHandler(push *matchvs.PushManager) {
+func (self *GsDefaultHandler) SetPushHandler(push matchvs.PushHandler) {
 	self.push = push
 }
 
