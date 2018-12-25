@@ -28,8 +28,8 @@ type MsOnJoinRoom struct {
 }
 
 type MsPlayerInfo struct {
-	UserID      uint32
-	UserProfile string
+	UserID      uint32 `json:"user_id"`
+	UserProfile []byte `json:"user_profile"`
 }
 
 // 观战设置类型
@@ -64,11 +64,11 @@ type MsCreateRoomRsp struct {
 
 // 观战房间信息
 type MsWatchRoom struct {
-	RoomID           uint64
-	State            uint32
-	CurWatch         uint32
-	WatchSet         *MsWatchSeting
-	WatchPlayersList []*MsPlayerInfo
+	RoomID           uint64          `json:"room_id"`
+	State            uint32          `json:"state"`
+	CurWatch         uint32          `json:"cur_watch"`
+	WatchSet         *MsWatchSeting  `json:"watchset"`
+	WatchPlayersList []*MsPlayerInfo `json:"watch_player_list"`
 }
 
 type MsOnReciveEvent struct {
@@ -88,43 +88,68 @@ type MsPushEventReq struct {
 	CpProto   []byte   //消息内容，不超过1024字节
 }
 
+type MsTeamInfoItem struct {
+	TeamID     uint64
+	Password   string
+	Capacity   uint32
+	Mode       int32
+	Owner      uint32
+	PlayerList []*MsPlayerInfo
+}
+
+type MsBrigadeItem struct {
+	BrigadeID uint32
+	TeamList  []*MsTeamInfoItem
+}
+
 // 获取房间详细信息返回参数
 type MsRoomDetail struct {
-	GameID       uint32
+	GameID       uint32           `json:"game_id"`
+	RoomID       uint64           `json:"room_id"`
+	UserID       uint32           `json:"user_id"`
+	State        uint32           `json:"state"`
+	MaxPlayer    uint32           `json:"max_player"`
+	Mode         int32            `json:"mode"`
+	CanWatch     int32            `json:"can_watch"`
+	RoomProperty string           `json:"room_property"`
+	Owner        uint32           `json:"owner"`
+	CreateFlag   uint32           `json:"create_flag"`
+	WatchRoom    *MsWatchRoom     `json:"watch_room"`
+	PlayersList  []*MsPlayerInfo  `json:"player_list"`
+	BrigadeList  []*MsBrigadeItem `json:"brigade_list"`
+}
+
+// 设置帧同步请求
+type MsSetFrameSyncRateReq struct {
 	RoomID       uint64
-	UserID       uint32
-	State        uint32
-	MaxPlayer    uint32
-	Mode         int32
-	CanWatch     int32
-	RoomProperty string
-	Owner        uint32
-	CreateFlag   uint32
-	WatchRoom    *MsWatchRoom
-	PlayersList  []*MsPlayerInfo
+	GameID       uint32
+	FrameRate    uint32
+	EnableGS     uint32
+	CacheFrameMS int32
 }
 
 //
 type MsFrameSyncRateNotify struct {
-	GameID    uint32
-	RoomID    uint64
-	FrameRate uint32
-	FrameIdx  uint32
-	Timestamp uint64
-	EnableGS  uint32
+	GameID       uint32
+	RoomID       uint64
+	FrameRate    uint32
+	FrameIdx     uint32
+	Timestamp    uint64
+	EnableGS     uint32
+	CacheFrameMS int32
 }
 
 // 每帧数据中包含多个数据项
-type FrameDataItem struct {
+type MsFrameDataItem struct {
 	SrcUserID uint32
 	CpProto   []byte
 	Timestamp uint64
 }
 
 // 每帧数据
-type FrameDataList struct {
+type MsFrameDataList struct {
 	GameID     uint32
 	RoomID     uint64
 	FrameIndex uint32
-	Items      []*FrameDataItem
+	Items      []*MsFrameDataItem
 }

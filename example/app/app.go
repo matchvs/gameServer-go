@@ -3,7 +3,7 @@
  * @Author: Ville
  * @Date: 2018-11-28 14:30:33
  * @LastEditors: Ville
- * @LastEditTime: 2018-12-18 18:09:50
+ * @LastEditTime: 2018-12-24 17:03:14
  * @Description: game server handler module, the struct of  App  implemente the interface which is located in game_server.go
  				 it is named BaseInterface
 */
@@ -79,9 +79,10 @@ func (d *App) OnUserState(req map[string]interface{}) (err error) {
 
 // 获取房间信息回调
 func (d *App) OnRoomDetail(req *defines.MsRoomDetail) (err error) {
-	log.LogD("OnRoomDetail %v", req)
+	jsonbuf, _ := json.Marshal(req)
+	log.LogD("OnRoomDetail %v", string(jsonbuf))
 	for _, v := range req.PlayersList {
-		log.LogD("OnRoomDetail PlayersList %v", v)
+		log.LogD("OnRoomDetail PlayersList userID:%d userProfile:%v", v.UserID, string(v.UserProfile))
 	}
 	log.LogD("OnRoomDetail WatchRoom %v", req.WatchRoom)
 	return
@@ -125,7 +126,7 @@ func (d *App) OnSetFrameSyncRate(req *defines.MsFrameSyncRateNotify) (err error)
 }
 
 // 帧数据更新
-func (d *App) OnFrameUpdate(req *defines.FrameDataList) (err error) {
+func (d *App) OnFrameUpdate(req *defines.MsFrameDataList) (err error) {
 	// log.LogD(" OnFrameUpdate %v", req)
 	for _, v := range req.Items {
 		log.LogD(" OnFrameUpdate roomID 【%d】 length【%d】 CpProto [%s], SrcUserID [%d] , Timestamp [%d]", req.RoomID, len(req.Items), v.CpProto, v.SrcUserID, v.Timestamp)
@@ -178,9 +179,13 @@ func (d *App) Example_Push(req *defines.MsOnReciveEvent) {
 	case "setRoomProperty":
 		d.push.SetRoomProperty(req.GameID, req.RoomID, "gameServer_go set room Property")
 	case "setFrameSyncRate":
-		rate := optMap["frameRate"].(float64)
-		enableGS := optMap["enableGS"].(float64)
-		d.push.SetFrameSyncRate(req.GameID, uint32(rate), uint32(enableGS), req.RoomID)
+		setinfo := &defines.MsSetFrameSyncRateReq{}
+		setinfo.FrameRate = uint32(optMap["frameRate"].(float64))
+		setinfo.EnableGS = uint32(optMap["enableGS"].(float64))
+		setinfo.RoomID = req.RoomID
+		setinfo.GameID = req.GameID
+		setinfo.CacheFrameMS = int32(optMap["cacheMs"].(float64))
+		d.push.SetFrameSyncRate(setinfo)
 	case "frameUpdate":
 		data := []byte("test message from gameServer_go frame synchronization")
 		operation := optMap["enableGS"].(float64)
@@ -194,6 +199,9 @@ func (d *App) Example_Push(req *defines.MsOnReciveEvent) {
 			CpProto:   []byte("gameServer push event test golang"),
 		}
 		d.push.PushEvent(event)
+	case "getCacheData":
+		cacheMs := optMap["cacheMs"].(float64)
+		d.push.GetOffLineCacheData(req.GameID, req.RoomID, int32(cacheMs))
 	default:
 	}
 }

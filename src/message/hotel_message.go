@@ -12,7 +12,7 @@ import (
 
 // 每个房间中的帧数据
 type roomFrameData struct {
-	FrameData map[uint32]*defines.FrameDataList
+	FrameData map[uint32]*defines.MsFrameDataList
 }
 
 // 房间中帧数据缓存池
@@ -27,10 +27,10 @@ func NewRoomFrameDataPool() *roomFrameDataPool {
 	}
 }
 
-func (self *roomFrameDataPool) addFrameData(gameID, frameIndex uint32, roomID uint64, item *defines.FrameDataItem) {
+func (self *roomFrameDataPool) addFrameData(gameID, frameIndex uint32, roomID uint64, item *defines.MsFrameDataItem) {
 	var (
 		roomframe *roomFrameData
-		frameData *defines.FrameDataList
+		frameData *defines.MsFrameDataList
 		ok        bool
 	)
 	self.lock.Lock()
@@ -39,16 +39,16 @@ func (self *roomFrameDataPool) addFrameData(gameID, frameIndex uint32, roomID ui
 
 	if !ok {
 		roomframe = new(roomFrameData)
-		roomframe.FrameData = make(map[uint32]*defines.FrameDataList)
+		roomframe.FrameData = make(map[uint32]*defines.MsFrameDataList)
 		self.cache[roomID] = roomframe
 	}
 	frameData, ok = roomframe.FrameData[frameIndex]
 	if !ok {
-		frameData = &defines.FrameDataList{}
+		frameData = &defines.MsFrameDataList{}
 		frameData.RoomID = roomID
 		frameData.GameID = gameID
 		frameData.FrameIndex = frameIndex
-		frameData.Items = make([]*defines.FrameDataItem, 0, 100)
+		frameData.Items = make([]*defines.MsFrameDataItem, 0, 100)
 		frameData.Items = append(frameData.Items, item)
 		roomframe.FrameData[frameIndex] = frameData
 	} else {
@@ -57,10 +57,10 @@ func (self *roomFrameDataPool) addFrameData(gameID, frameIndex uint32, roomID ui
 }
 
 // 获取 或添加房间帧数据
-func (self *roomFrameDataPool) getFrameData(gameID, frameIndex uint32, roomID uint64) *defines.FrameDataList {
+func (self *roomFrameDataPool) getFrameData(gameID, frameIndex uint32, roomID uint64) *defines.MsFrameDataList {
 	var (
 		roomframe *roomFrameData
-		frameData *defines.FrameDataList
+		frameData *defines.MsFrameDataList
 		ok        bool
 		noFrame   bool
 	)
@@ -76,11 +76,11 @@ func (self *roomFrameDataPool) getFrameData(gameID, frameIndex uint32, roomID ui
 		}
 	}
 	if noFrame {
-		frameData = &defines.FrameDataList{}
+		frameData = &defines.MsFrameDataList{}
 		frameData.RoomID = roomID
 		frameData.GameID = gameID
 		frameData.FrameIndex = frameIndex
-		frameData.Items = make([]*defines.FrameDataItem, 0, 100)
+		frameData.Items = make([]*defines.MsFrameDataItem, 0, 100)
 	}
 	return frameData
 }
@@ -269,6 +269,9 @@ func (m *HotelMessage) onPlayerCheckin(connID uint64, req servers.GSRequest) ([]
 	//加入房间的信息
 	roominfo := &pb.JoinExtInfo{}
 	joinroom := m.msgCache.GetWaitJoin(playercheckin.RoomID, playercheckin.UserID)
+	if joinroom == nil {
+		return nil, nil
+	}
 	proto.Unmarshal(joinroom.CpProto, roominfo)
 	m.msgCache.DelWaitJoin(playercheckin.RoomID, playercheckin.UserID)
 
@@ -303,12 +306,13 @@ func (m *HotelMessage) onSetFrameSyncRate(connID uint64, req servers.GSRequest) 
 		m.enableFrameSync[syncRate.RoomID] = true
 	}
 	frameSyncRate := &defines.MsFrameSyncRateNotify{
-		FrameIdx:  syncRate.GetFrameIdx(),
-		FrameRate: syncRate.GetFrameRate(),
-		RoomID:    syncRate.GetRoomID(),
-		EnableGS:  syncRate.GetEnableGS(),
-		Timestamp: syncRate.GetTimeStamp(),
-		GameID:    syncRate.GetGameID(),
+		FrameIdx:     syncRate.GetFrameIdx(),
+		FrameRate:    syncRate.GetFrameRate(),
+		RoomID:       syncRate.GetRoomID(),
+		EnableGS:     syncRate.GetEnableGS(),
+		Timestamp:    syncRate.GetTimeStamp(),
+		GameID:       syncRate.GetGameID(),
+		CacheFrameMS: syncRate.GetCacheFrameMS(),
 	}
 	m.enableGsFrameSync[syncRate.RoomID] = syncRate.EnableGS
 	m.handle.OnSetFrameSyncRate(frameSyncRate)
@@ -321,7 +325,7 @@ func (m *HotelMessage) onFrameDataNotify(connID uint64, req servers.GSRequest) (
 	m.addClient(dataNotify.RoomID, connID)
 
 	if ok := m.enableFrameSync[dataNotify.RoomID]; ok {
-		frameItem := &defines.FrameDataItem{
+		frameItem := &defines.MsFrameDataItem{
 			SrcUserID: dataNotify.SrcUid,
 			CpProto:   dataNotify.CpProto[:],
 			Timestamp: dataNotify.TimeStamp,
@@ -345,5 +349,10 @@ func (m *HotelMessage) onFrameUpdate(connID uint64, req servers.GSRequest) ([]by
 	} else {
 		m.roomFramesPool.delRoomFrame(frameUpdate.RoomID)
 	}
+	return nil, nil
+}
+
+func (m *HotelMessage) onGetCacheData(connID uint64, req servers.GSRequest) ([]byte, error) {
+	log.LogD("触发获取断线帧数据")
 	return nil, nil
 }

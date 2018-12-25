@@ -3,7 +3,7 @@
  * @Author: Ville
  * @Date: 2018-11-27 20:08:05
  * @LastEditors: Ville
- * @LastEditTime: 2018-12-18 18:58:36
+ * @LastEditTime: 2018-12-20 14:59:50
  * @Description: matchvs game server , the main module for start or stop server
  */
 
@@ -77,13 +77,19 @@ type PushHandler interface {
 	// frameRate : 帧率（0到20，且能被1000整除）
 	// enableGS GameServer是否参与帧同步（0：不参与；1：参与）
 	// roomID : 要设置帧同步的房间ID
-	SetFrameSyncRate(gameID, frameRate, enableGS uint32, roomID uint64)
+	SetFrameSyncRate(setinfo *defines.MsSetFrameSyncRateReq)
 	// FrameBroadcast 发送帧同步数据给 游戏房间服务
 	// gameID : 游戏ID
 	// operation : 数据处理方式 0：只发客户端；1：只发GS；2：同时发送客户端和GS
 	// roomID : 房间ID
 	// cpProto : 要发送的数据
 	FrameBroadcast(gameID uint32, operation int32, roomID uint64, cpProto []byte)
+
+	// GetOffLineCacheData 获取断线重新连接后的缓存数据
+	// gameID : 游戏ID
+	// cacheMS : 想要获取的毫秒数(-1表示获取所有缓存数据，该字段的赋值上限为1小时)
+	// roomID : 房间ID
+	GetOffLineCacheData(gameID uint32, roomID uint64, cacheMS int32) error
 }
 
 // 初始化读取配置

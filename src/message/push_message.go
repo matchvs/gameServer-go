@@ -3,7 +3,7 @@
  * @Author: Ville
  * @Date: 2018-12-18 18:18:45
  * @LastEditors: Ville
- * @LastEditTime: 2018-12-18 18:20:50
+ * @LastEditTime: 2018-12-20 15:00:26
  * @Description: message push
  */
 package message
@@ -154,13 +154,15 @@ func (self *PushManager) DestroyRoom(gameID uint32, roomID uint64) (uint32, erro
 // frameRate : 帧率（0到20，且能被1000整除）
 // enableGS GameServer是否参与帧同步（0：不参与；1：参与）
 // roomID : 要设置帧同步的房间ID
-func (self *PushManager) SetFrameSyncRate(gameID, frameRate, enableGS uint32, roomID uint64) {
+func (self *PushManager) SetFrameSyncRate(setinfo *defines.MsSetFrameSyncRateReq) {
 	req := new(pb.GSSetFrameSyncRate)
-	req.GameID = gameID
-	req.FrameRate = frameRate
+	req.RoomID = setinfo.RoomID
+	req.GameID = setinfo.GameID
+	req.FrameRate = setinfo.FrameRate
 	req.FrameIdx = 1
 	req.Priority = 0
-	req.EnableGS = enableGS
+	req.EnableGS = setinfo.EnableGS
+	req.CacheFrameMS = setinfo.CacheFrameMS
 	msg, _ := proto.Marshal(req)
 	self.adaptor.PushHotel(uint32(pb.HotelGsCmdID_GSSetFrameSyncRateCMDID), req.RoomID, msg)
 }
@@ -179,4 +181,20 @@ func (self *PushManager) FrameBroadcast(gameID uint32, operation int32, roomID u
 	req.CpProto = cpProto[:len(cpProto)]
 	msg, _ := proto.Marshal(req)
 	self.adaptor.PushHotel(uint32(pb.HotelGsCmdID_GSFrameBroadcastCMDID), req.RoomID, msg)
+}
+
+// GetOffLineCacheData 获取断线重新连接后的缓存数据
+// gameID : 游戏ID
+// cacheMS : 想要获取的毫秒数(-1表示获取所有缓存数据，该字段的赋值上限为1小时)
+// roomID : 房间ID
+func (self *PushManager) GetOffLineCacheData(gameID uint32, roomID uint64, cacheMS int32) error {
+	req := new(pb.GSGetCacheData)
+	req.GameID = gameID
+	req.RoomID = roomID
+	req.CacheFrameMS = cacheMS
+	msg, err := proto.Marshal(req)
+	if err != nil {
+		return err
+	}
+	return self.adaptor.PushHotel(uint32(pb.HotelGsCmdID_GSGetCacheDataCMDID), req.RoomID, msg)
 }

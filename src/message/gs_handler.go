@@ -34,5 +34,5 @@ type IHandler interface {
 	// 设置帧同步
 	OnSetFrameSyncRate(*defines.MsFrameSyncRateNotify) error
 	// 帧数据更新
-	OnFrameUpdate(*defines.FrameDataList) error
+	OnFrameUpdate(*defines.MsFrameDataList) error
 }
