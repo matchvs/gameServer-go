@@ -108,12 +108,13 @@ func (d *GsDefaultHandler) OnSetFrameSyncRate(req *defines.MsFrameSyncRateNotify
 }
 
 // 帧数据更新
-func (d *GsDefaultHandler) OnFrameUpdate(req *defines.FrameDataList) (err error) {
+func (d *GsDefaultHandler) OnFrameUpdate(req *defines.MsFrameDataList) (err error) {
 	for _, v := range req.Items {
 		log.LogD(" OnFrameUpdate  len [%d]  CpProto [%s], Timestamp [%d]", len(req.Items), string(v.CpProto), v.Timestamp)
 	}
 	return
 }
+
 func (d *GsDefaultHandler) Example_Push(req *defines.MsOnReciveEvent) {
 	var optMap map[string]interface{}
 	if err := json.Unmarshal(req.CpProto, &optMap); err != nil {
@@ -158,9 +159,13 @@ func (d *GsDefaultHandler) Example_Push(req *defines.MsOnReciveEvent) {
 	case "setRoomProperty":
 		d.push.SetRoomProperty(req.GameID, req.RoomID, "gameServer_go set room Property")
 	case "setFrameSyncRate":
-		rate := optMap["frameRate"].(float64)
-		enableGS := optMap["enableGS"].(float64)
-		d.push.SetFrameSyncRate(req.GameID, uint32(rate), uint32(enableGS), req.RoomID)
+		setinfo := &defines.MsSetFrameSyncRateReq{}
+		setinfo.FrameRate = uint32(optMap["frameRate"].(float64))
+		setinfo.EnableGS = uint32(optMap["enableGS"].(float64))
+		setinfo.RoomID = req.RoomID
+		setinfo.GameID = req.GameID
+		setinfo.CacheFrameMS = int32(optMap["cacheMs"].(float64))
+		d.push.SetFrameSyncRate(setinfo)
 	case "frameUpdate":
 		data := []byte("test message from gameServer_go frame synchronization")
 		operation := optMap["enableGS"].(float64)
@@ -174,6 +179,9 @@ func (d *GsDefaultHandler) Example_Push(req *defines.MsOnReciveEvent) {
 			CpProto:   []byte("gameServer push event test golang"),
 		}
 		d.push.PushEvent(event)
+	case "getCacheData":
+		cacheMs := optMap["cacheMs"].(float64)
+		d.push.GetOffLineCacheData(req.GameID, req.RoomID, int32(cacheMs))
 	default:
 	}
 }

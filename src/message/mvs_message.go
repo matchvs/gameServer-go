@@ -147,6 +147,7 @@ func (m *MvsMessage) OnJoinRoom(req *pb.Request) ([]byte, error) {
 	m.msgCache.AddWaitJoin(req.RoomID, req.UserID, cache)
 	return nil, nil
 }
+
 func (m *MvsMessage) OnJoinOver(req *pb.Request) ([]byte, error) {
 
 	infoMap := make(map[string]interface{})
@@ -156,6 +157,7 @@ func (m *MvsMessage) OnJoinOver(req *pb.Request) ([]byte, error) {
 	m.handle.OnJoinOver(infoMap)
 	return nil, nil
 }
+
 func (m *MvsMessage) OnJoinOpen(req *pb.Request) ([]byte, error) {
 
 	infoMap := make(map[string]interface{})
@@ -165,6 +167,7 @@ func (m *MvsMessage) OnJoinOpen(req *pb.Request) ([]byte, error) {
 	m.handle.OnJoinOpen(infoMap)
 	return nil, nil
 }
+
 func (m *MvsMessage) OnLeaveRoom(req *pb.Request) ([]byte, error) {
 	infoMap := make(map[string]interface{})
 	roomID := req.GetRoomID()
@@ -235,7 +238,7 @@ func (m *MvsMessage) OnRoomDetail(req *pb.Request) ([]byte, error) {
 	for k, v := range roomDetail.PlayerInfos {
 		player := new(defines.MsPlayerInfo)
 		player.UserID = v.GetUserID()
-		player.UserProfile = string(v.GetUserProfile())
+		player.UserProfile = v.GetUserProfile()
 		room.PlayersList[k] = player
 	}
 
@@ -255,12 +258,41 @@ func (m *MvsMessage) OnRoomDetail(req *pb.Request) ([]byte, error) {
 	watchRoom.WatchPlayersList = make([]*defines.MsPlayerInfo, len(pb_watchRoom.WatchPlayers))
 	for k, v := range pb_watchRoom.WatchPlayers {
 		watchPlayer := new(defines.MsPlayerInfo)
-		watchPlayer.UserProfile = string(v.GetUserProfile())
+		watchPlayer.UserProfile = v.GetUserProfile()
 		watchPlayer.UserID = v.GetUserID()
 		watchRoom.WatchPlayersList[k] = watchPlayer
 	}
-
 	room.WatchRoom = watchRoom
+
+	// 获取组队信息
+	pb_brigade := roomDetail.GetBrigades()
+	brigades := make([]*defines.MsBrigadeItem, len(pb_brigade))
+	for k, v := range pb_brigade {
+		brigade := new(defines.MsBrigadeItem)
+		brigade.BrigadeID = v.GetBrigadeID()
+		teamlist := make([]*defines.MsTeamInfoItem, len(v.Teams))
+		for kt, vt := range v.Teams {
+			team := new(defines.MsTeamInfoItem)
+			team.Capacity = vt.TeamInfo.GetCapacity()
+			team.Mode = vt.TeamInfo.GetMode()
+			team.Owner = vt.TeamInfo.GetOwner()
+			team.Password = vt.TeamInfo.GetPassword()
+			team.TeamID = vt.TeamInfo.GetTeamID()
+			t_players := make([]*defines.MsPlayerInfo, len(vt.Player))
+			for kp, vp := range vt.Player {
+				pu := new(defines.MsPlayerInfo)
+				pu.UserID = vp.GetUserID()
+				pu.UserProfile = vp.GetUserProfile()
+				t_players[kp] = pu
+			}
+			team.PlayerList = t_players[:]
+			teamlist[kt] = team
+		}
+		brigade.TeamList = teamlist[:]
+		brigades[k] = brigade
+	}
+	room.BrigadeList = brigades[:]
+
 	m.handle.OnRoomDetail(room)
 	return nil, nil
 }
